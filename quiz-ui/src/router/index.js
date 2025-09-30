@@ -25,6 +25,11 @@ const router = createRouter({
       component: () => import('../views/ScorePage.vue'),
     },
     {
+      path: '/admin',
+      name: 'AdminPage',
+      component: () => import('../views/AdminPage.vue'),
+    },
+    {
       path: '/about',
       name: 'about',
       // route level code-splitting
