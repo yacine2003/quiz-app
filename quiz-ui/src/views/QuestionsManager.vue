@@ -3,10 +3,12 @@ import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import QuestionDisplay from '@/components/QuestionDisplay.vue';
 import quizApiService from '@/services/QuizApiService';
+import participationStorageService from '@/services/ParticipationStorageService';
 
 const currentQuestion = ref({});
 const currentQuestionPosition = ref(1);
 const totalNumberOfQuestions = ref(0);
+const currentScore = ref(0);
 const router = useRouter();
 
 onMounted(async () => {
@@ -25,7 +27,10 @@ async function loadQuestionByPosition(position) {
 }
 
 async function answerClickedHandler(answer) {
-  // TODO: Sauvegarder la réponse
+  // Vérifier si la réponse est correcte
+  if (answer.isCorrect) {
+    currentScore.value++;
+  }
   
   // Passer à la question suivante ou terminer le quiz
   if (currentQuestionPosition.value < totalNumberOfQuestions.value) {
@@ -36,9 +41,11 @@ async function answerClickedHandler(answer) {
 }
 
 function endQuiz() {
-  // TODO: Rediriger vers la page de score
-  alert('Quiz terminé !');
-  router.push('/');
+  // Sauvegarder le score dans le local storage
+  participationStorageService.saveParticipationScore(currentScore.value);
+  
+  // Rediriger vers la page de score
+  router.push('/score');
 }
 </script>
 
