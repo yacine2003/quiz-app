@@ -2,6 +2,5 @@
 </script>
 
 <template>
-  <main>
-  </main>
+  <h1>New Quiz Page</h1>
 </template>
