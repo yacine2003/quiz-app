@@ -15,6 +15,11 @@ const router = createRouter({
       component: () => import('../views/NewQuizPage.vue'),
     },
     {
+      path: '/questions',
+      name: 'QuestionsManager',
+      component: () => import('../views/QuestionsManager.vue'),
+    },
+    {
       path: '/about',
       name: 'about',
       // route level code-splitting
