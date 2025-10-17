@@ -71,8 +71,104 @@ def login():
 @app.route('/quiz-info', methods=['GET'])
 def get_quiz_info():
     """Renvoie les infos générales du quiz (version initiale vide)."""
-    # TODO: mettra à jour avec données réelles plus tard
-    return {"size": 0, "scores": []}, 200
+    size = Question.query.count()
+    return {"size": size, "scores": []}, 200
+
+
+# ---------------------------
+# Endpoints Questions
+# ---------------------------
+
+
+from jwt_utils import decode_token, JwtError  # noqa: E402  pylint: disable=wrong-import-position
+from questions_service import create_question, update_question as update_question_service  # noqa: E402  pylint: disable=wrong-import-position
+
+
+def _check_admin_token(auth_header: str | None):
+    """Valide le header Authorization et lève 401 en cas de problème."""
+    if not auth_header or not auth_header.startswith('Bearer '):
+        return False
+    token = auth_header.split(' ', 1)[1]
+    try:
+        decode_token(token)
+        return True
+    except JwtError:
+        return False
+
+
+@app.route('/questions', methods=['POST'])
+def post_question():
+    """Crée une nouvelle question. Protégé par JWT."""
+    if not _check_admin_token(request.headers.get('Authorization')):
+        return 'Unauthorized', 401
+
+    try:
+        data = request.get_json(force=True)
+        question = create_question(data, db=db, Question=Question)
+        # Réponses simulées, à affiner plus tard
+        dummy_answers = [
+            {"id": 1, "text": "Réponse A"},
+            {"id": 2, "text": "Réponse B"},
+            {"id": 3, "text": "Réponse C"},
+        ]
+        return {**question.to_dict(), "answers": dummy_answers}, 201
+    except ValueError as exc:
+        return str(exc), 400
+
+
+# ---------------------------
+# Endpoints lecture Questions (public)
+# ---------------------------
+
+
+def _dummy_answers():  # provisoire
+    return [
+        {"id": 1, "text": "Réponse A"},
+        {"id": 2, "text": "Réponse B"},
+        {"id": 3, "text": "Réponse C"},
+    ]
+
+
+@app.route('/questions', methods=['GET'])
+def get_question_by_position():
+    """Retourne la question selon ?position= (public)."""
+    pos = request.args.get('position', type=int)
+    if pos is None:
+        return 'Missing query param position', 400
+
+    question = Question.query.filter_by(position=pos).first()
+    if question is None:
+        return 'Not found', 404
+    return {**question.to_dict(), "answers": _dummy_answers()}, 200
+
+
+@app.route('/questions/<int:question_id>', methods=['GET'])
+def get_question_by_id(question_id: int):
+    question = Question.query.get(question_id)
+    if question is None:
+        return 'Not found', 404
+    return {**question.to_dict(), "answers": _dummy_answers()}, 200
+
+
+@app.route('/questions/<int:question_id>', methods=['PUT'])
+def update_question(question_id: int):
+    if not _check_admin_token(request.headers.get('Authorization')):
+        return 'Unauthorized', 401
+
+    question = Question.query.get(question_id)
+    if question is None:
+        return 'Not found', 404
+
+    try:
+        data = request.get_json(force=True)
+    except Exception:  # noqa: BLE001
+        return 'Invalid JSON', 400
+
+    try:
+        updated = update_question_service(question, data, db=db, Question=Question)  # type: ignore
+        return {**updated.to_dict(), "answers": _dummy_answers()}, 200
+    except ValueError as exc:
+        return str(exc), 400
 
 
 # ---------------------------
