@@ -1,0 +1,17 @@
+id,question,choiceA,choiceB,choiceC,choiceD,correct,explanation,difficulty,tags
+q1,"Quel joueur a remporté le plus de titres du Grand Chelem en simple messieurs ?","Roger Federer","Novak Djokovic","Rafael Nadal","Pete Sampras",B,"Novak Djokovic détient le record avec 24 titres du Grand Chelem (2024).",easy,"tennis,sport,grand-chelem"
+q2,"Sur quelle surface se joue le tournoi de Roland-Garros ?",Gazon,Dur,"Terre battue",Synthétique,C,"Roland-Garros se joue sur terre battue rouge, surface lente.",easy,"tennis,roland-garros,surface"
+q3,"Combien de points faut-il pour gagner un jeu au tennis (en général) ?","3 points","4 points avec 2 d'écart","5 points","6 points",B,"Il faut 4 points (15-30-40-jeu) avec au moins 2 points d'écart.",easy,"tennis,regles,score"
+q4,"Quelle joueuse a remporté 23 titres du Grand Chelem en simple ?","Steffi Graf","Serena Williams","Martina Navratilova","Margaret Court",B,"Serena Williams a 23 titres, juste derrière Margaret Court (24).",easy,"tennis,sport,feminin"
+q5,"Quel est le nom du tournoi de tennis sur gazon le plus prestigieux ?","US Open",Wimbledon,"Open d'Australie",Masters,B,"Wimbledon, le plus ancien tournoi du Grand Chelem, se joue sur gazon.",easy,"tennis,wimbledon,gazon"
+q6,"Combien de Grand Chelem y a-t-il par an ?",2,3,4,5,C,"4 tournois : Open d'Australie, Roland-Garros, Wimbledon, US Open.",easy,"tennis,grand-chelem"
+q7,"Qu'est-ce qu'un 'ace' au tennis ?","Un coup gagnant en fond de court","Un service gagnant non touché par l'adversaire","Une balle qui touche le filet","Un smash",B,"Un ace est un service que l'adversaire ne touche pas.",easy,"tennis,vocabulaire,service"
+q8,"Quel Français a remporté Roland-Garros en 1983 ?","Yannick Noah","Henri Leconte","Guy Forget","Cédric Pioline",A,"Yannick Noah est le dernier Français à avoir gagné Roland-Garros (1983).",easy,"tennis,france,histoire"
+q9,"Combien de sets maximum dans un match masculin de Grand Chelem ?","3 sets","4 sets","5 sets","7 sets",C,"Les matchs masculins de Grand Chelem se jouent au meilleur des 5 sets.",easy,"tennis,regles,grand-chelem"
+q10,"À quel âge Rafael Nadal a-t-il remporté son premier Roland-Garros ?","17 ans","19 ans","21 ans","23 ans",B,"Nadal a gagné son premier RG en 2005 à 19 ans.",easy,"tennis,nadal,histoire"
+q11,"Quel est le nom de la Coupe par équipes masculine internationale ?","Fed Cup","Davis Cup","Hopman Cup","Laver Cup",B,"La Coupe Davis est la compétition par équipes pour les hommes.",easy,"tennis,competition,equipe"
+q12,"Quelle est la durée d'un changement de côté au tennis ?","60 secondes","90 secondes","120 secondes","30 secondes",B,"Les joueurs ont 90 secondes lors des changements de côté.",easy,"tennis,regles"
+q13,"Quel joueur est surnommé 'Le Matador' ?","Roger Federer","Rafael Nadal","Novak Djokovic","Carlos Alcaraz",B,"Rafael Nadal est surnommé 'Le Matador' ou 'Rafa'.",easy,"tennis,surnom,nadal"
+q14,"Dans quel pays se déroule l'US Open ?",Angleterre,Australie,États-Unis,France,C,"L'US Open se déroule à New York, États-Unis.",easy,"tennis,us-open,geographie"
+q15,"Qu'est-ce qu'un 'break' au tennis ?","Gagner son jeu de service","Gagner le jeu de service adverse","Perdre un set","Faire une pause",B,"Un break signifie gagner le jeu de service de l'adversaire.",easy,"tennis,vocabulaire,tactique"
+
