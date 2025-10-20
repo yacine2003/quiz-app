@@ -72,7 +72,7 @@ function isTypingTarget(target: EventTarget | null): boolean {
   return el.isContentEditable || tag === 'input' || tag === 'textarea' || tag === 'select'
 }
 const goHome = () => router.push({ path: '/' })
-const goQuiz = () => router.push({ path: '/quiz/1/start' })
+const goQuiz = () => router.push({ path: '/quiz' })
 const goLeaderboard = () => router.push({ path: '/quiz/1/leaderboard' })
 const goAdmin = () => router.push({ path: '/admin' })
 
@@ -147,10 +147,10 @@ watch(isShrunk, () => updateHeaderOffset())
         >Accueil</router-link>
 
         <router-link
-          to="/quiz/1/start"
+          to="/quiz"
           class="px-1 py-1 rounded focus-visible:ring-2 focus-visible:ring-primary-500"
-          :class="(route.path.startsWith('/quiz') && route.path.includes('/start')) ? 'text-primary-700 dark:text-primary-300 underline underline-offset-4' : 'text-gray-700 dark:text-gray-200 hover:text-gray-900 dark:hover:text-white'"
-          :aria-current="(route.path.startsWith('/quiz') && route.path.includes('/start')) ? 'page' : undefined"
+          :class="route.path === '/quiz' ? 'text-primary-700 dark:text-primary-300 underline underline-offset-4' : 'text-gray-700 dark:text-gray-200 hover:text-gray-900 dark:hover:text-white'"
+          :aria-current="route.path === '/quiz' ? 'page' : undefined"
         >Quiz</router-link>
 
         <router-link
@@ -238,10 +238,10 @@ watch(isShrunk, () => updateHeaderOffset())
           >Accueil</router-link>
 
           <router-link
-            to="/quiz/1/start"
+            to="/quiz"
             class="px-3 py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800 focus-visible:ring-2 focus-visible:ring-primary-500"
-            :class="(route.path.startsWith('/quiz') && route.path.includes('/start')) ? 'text-primary-700 dark:text-primary-300' : 'text-gray-800 dark:text-gray-200'"
-            :aria-current="(route.path.startsWith('/quiz') && route.path.includes('/start')) ? 'page' : undefined"
+            :class="route.path === '/quiz' ? 'text-primary-700 dark:text-primary-300' : 'text-gray-800 dark:text-gray-200'"
+            :aria-current="route.path === '/quiz' ? 'page' : undefined"
             @click="onMenuLinkClick"
           >Quiz</router-link>
 

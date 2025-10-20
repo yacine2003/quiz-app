@@ -18,6 +18,13 @@ export const useQuizStore = defineStore('quiz', () => {
   const endTime = ref<number>(0)
   const isCompleted = ref(false)
   const attemptId = ref<number | null>(null)
+  // Nouveaux champs (compatibilité API minimale demandée)
+  const currentQuizId = quizId // alias
+  const quizzes = ref<Array<{ id: string; title: string; description: string; difficulty: 'easy'|'medium'|'hard' }>>([
+    { id: 'bases', title: 'Bases du tennis (Facile)', description: 'Règles et notions essentielles pour débuter.', difficulty: 'easy' },
+    { id: 'roland', title: 'Roland-Garros', description: 'Le tournoi parisien sur terre battue.', difficulty: 'medium' },
+    { id: 'avance', title: 'Tennis avancé / technique', description: 'Grips, effets et tactiques.', difficulty: 'hard' }
+  ])
 
   // Persistent state (localStorage)
   const savedProgress = useLocalStorage('quiz-progress', {
@@ -50,6 +57,12 @@ export const useQuizStore = defineStore('quiz', () => {
     if (!totalQuestions.value) return 0
     return Math.round((currentIndex.value / totalQuestions.value) * 100)
   })
+  // Getter supplémentaire demandé
+  const progressPercent = computed(() => progress.value)
+  const player = computed(() => playerName.value)
+  const current = computed(() => currentIndex.value)
+  const total = computed(() => totalQuestions.value)
+  const elapsed = computed(() => timeSpent.value)
 
   const canGoNext = computed(() => {
     return answers.value.has(currentIndex.value)
@@ -86,6 +99,33 @@ export const useQuizStore = defineStore('quiz', () => {
       startTime.value = Date.now()
       saveProgress()
     }
+  }
+
+  // Actions supplémentaires demandées (wrappers)
+  async function startQuiz(id: number | string, name?: string) {
+    const numeric = typeof id === 'string' ? (id === 'bases' ? 1 : id === 'roland' ? 2 : 3) : id
+    await initializeQuiz(numeric, (name && name.trim()) || 'Invité')
+  }
+
+  function next() {
+    nextQuestion()
+  }
+
+  function setElapsed(seconds: number) {
+    // Simule l'écoulement du temps en ajustant startTime si nécessaire
+    if (!startTime.value) startTime.value = Date.now()
+    endTime.value = startTime.value + Math.max(0, Math.floor(seconds)) * 1000
+  }
+
+  function selectQuiz(id: number | string) {
+    const numeric = typeof id === 'string' ? (id === 'bases' ? 1 : id === 'roland' ? 2 : 3) : id
+    quizId.value = numeric
+  }
+
+  async function prefetchNext() {
+    // Point d’extension: préchargement réseau si nécessaire
+    // Ici rien à faire car les questions sont déjà en mémoire
+    return Promise.resolve()
   }
 
   function answerQuestion(choiceId: number) {
@@ -209,6 +249,8 @@ export const useQuizStore = defineStore('quiz', () => {
     endTime,
     isCompleted,
     attemptId,
+    currentQuizId,
+    quizzes,
 
     // Computed
     currentQuestion,
@@ -222,6 +264,11 @@ export const useQuizStore = defineStore('quiz', () => {
     canGoPrevious,
     isLastQuestion,
     allQuestionsAnswered,
+    progressPercent,
+    player,
+    current,
+    total,
+    elapsed,
 
     // Actions
     initializeQuiz,
@@ -231,7 +278,13 @@ export const useQuizStore = defineStore('quiz', () => {
     goToQuestion,
     submitQuiz,
     reset,
-    getAnswerForQuestion
+    getAnswerForQuestion,
+    // Nouveaux alias/actions
+    startQuiz,
+    next,
+    setElapsed,
+    selectQuiz,
+    prefetchNext
   }
 })
 
