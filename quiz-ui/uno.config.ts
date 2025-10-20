@@ -36,7 +36,9 @@ export default defineConfig({
     'i-heroicons-clock',
     'i-heroicons-fire',
     'i-heroicons-check-circle',
-    'i-heroicons-x-circle'
+    'i-heroicons-x-circle',
+    'i-heroicons-moon',
+    'i-heroicons-sun'
   ]
 })
 
