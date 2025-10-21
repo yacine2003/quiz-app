@@ -1,44 +1,67 @@
-# quiz-ui
+# Quiz UI - Frontend Vue 3 + TypeScript
 
-This template should help get you started developing with Vue 3 in Vite.
+Interface utilisateur moderne et responsive pour l'application Quiz.
 
-## Recommended IDE Setup
+## Démarrage rapide
 
-[VS Code](https://code.visualstudio.com/) + [Vue (Official)](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
-
-## Recommended Browser Setup
-
-- Chromium-based browsers (Chrome, Edge, Brave, etc.):
-  - [Vue.js devtools](https://chromewebstore.google.com/detail/vuejs-devtools/nhdogjmejiglipccpnnnanhbledajbpd) 
-  - [Turn on Custom Object Formatter in Chrome DevTools](http://bit.ly/object-formatters)
-- Firefox:
-  - [Vue.js devtools](https://addons.mozilla.org/en-US/firefox/addon/vue-js-devtools/)
-  - [Turn on Custom Object Formatter in Firefox DevTools](https://fxdx.dev/firefox-devtools-custom-object-formatters/)
-
-## Customize configuration
-
-See [Vite Configuration Reference](https://vite.dev/config/).
-
-## Project Setup
-
-```sh
+```bash
+# Installer les dépendances
 npm install
-```
 
-### Compile and Hot-Reload for Development
-
-```sh
+# Lancer le serveur de développement
 npm run dev
 ```
 
-### Compile and Minify for Production
+Application disponible sur http://localhost:3000
 
-```sh
-npm run build
+## Scripts
+
+```bash
+npm run dev          # Serveur de développement
+npm run build        # Build production
+npm run preview      # Preview du build
+npm run lint         # Linter ESLint
+npm run typecheck    # Vérification TypeScript
+npm run test         # Tests unitaires (Vitest)
+npm run test:e2e     # Tests E2E (Playwright)
 ```
 
-### Lint with [ESLint](https://eslint.org/)
+## Structure
 
-```sh
-npm run lint
 ```
+src/
+├── components/      # Composants réutilisables
+├── views/          # Pages/routes
+├── stores/         # Pinia stores
+├── services/       # API clients
+├── types/          # TypeScript types
+├── router/         # Vue Router
+└── assets/         # CSS, images
+```
+
+## Technologies
+
+- **Vue 3** - Framework progressif
+- **TypeScript** - Type safety
+- **Pinia** - State management
+- **Vue Router** - Routing
+- **TanStack Query** - Data fetching
+- **UnoCSS** - Utility-first CSS
+- **Vite** - Build tool
+
+## Configuration
+
+Variables d'environnement (`.env.local`) :
+
+```
+VITE_API_URL=http://localhost:5001/api
+```
+
+## Features
+
+- 🎨 Design moderne avec UnoCSS
+- 🌙 Mode sombre automatique
+- 📱 Responsive mobile-first
+- ⚡ Performance optimisée
+- 🔄 PWA ready
+- 💾 Sauvegarde automatique
