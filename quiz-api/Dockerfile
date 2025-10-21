@@ -1,35 +1,30 @@
-# Dockerfile pour l'API Flask
-FROM python:3.13-slim
+# Image de l'API basée sur une image python
+FROM python:3.11-alpine
 
-# Variables d'environnement
-ENV PYTHONUNBUFFERED=1 \
-    PYTHONDONTWRITEBYTECODE=1 \
-    PIP_NO_CACHE_DIR=1 \
-    PIP_DISABLE_PIP_VERSION_CHECK=1
-
-# Répertoire de travail
+# Création et positionnement du répertoire par défaut dans le container
 WORKDIR /app
 
-# Installer les dépendances système
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends gcc && \
-    rm -rf /var/lib/apt/lists/*
+# Copie du fichier requirements local (machine hôte) vers le container 
+# (répertoire /app, car il s'agit du WORKDIR)
+COPY requirements.txt requirements.txt
 
-# Copier requirements
-COPY requirements.txt .
+# Installation des dépendances dans le container
+RUN pip install -r requirements.txt
 
-# Installer les dépendances Python
-RUN pip install --no-cache-dir -r requirements.txt
+# Creation d'une base vide
+RUN touch quiz.db
 
-# Copier le code de l'application
+# Variables d'environement de production
+ENV FLASK_DEBUG=0
+ENV FLASK_ENV=production
+ENV FLASK_APP=app.py
+
+# Copie de l'ensemble du code + dépendances
 COPY . .
 
-# Créer le répertoire pour la base de données
-RUN mkdir -p /app/data
+# Informations sur l'image
+LABEL maintainer="Housny Yacine <housny.yacine@esiee.fr>" \
+    version="1.0"
 
-# Exposer le port
-EXPOSE 5001
-
-# Commande de démarrage
-CMD ["python", "app_new.py"]
-
+# Commande de démarrage du serveur gunicorn
+CMD ["gunicorn", "--bind", "0.0.0.0:5000", "app:app", "--log-level", "info", "--error-logfile", "-", "--access-logfile", "-"]
