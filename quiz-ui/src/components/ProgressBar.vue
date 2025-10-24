@@ -23,7 +23,7 @@ const percent = computed(() => {
       aria-label="Progression du quiz"
     >
       <div
-        class="h-full bg-primary-600/80 transition-[width] duration-150"
+        class="h-full bg-white/75 dark:bg-gray-900/70 transition-[width] duration-150"
         :style="{ width: `${percent}%` }"
       />
     </div>
