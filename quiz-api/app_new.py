@@ -24,12 +24,16 @@ def create_app(config_name='default'):
     from routes.question_routes import question_bp
     from routes.attempt_routes import attempt_bp
     from routes.leaderboard_routes import leaderboard_bp
+    from routes.admin_routes import admin_bp
+    from routes.legacy_routes import legacy_bp
     
     app.register_blueprint(auth_bp, url_prefix='/api/auth')
     app.register_blueprint(quiz_bp, url_prefix='/api/quizzes')
     app.register_blueprint(question_bp, url_prefix='/api/questions')
     app.register_blueprint(attempt_bp, url_prefix='/api/attempts')
     app.register_blueprint(leaderboard_bp, url_prefix='/api/leaderboard')
+    app.register_blueprint(admin_bp, url_prefix='/admin')
+    app.register_blueprint(legacy_bp, url_prefix='/api')
     
     # Create tables
     with app.app_context():
