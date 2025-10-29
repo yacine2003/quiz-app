@@ -12,23 +12,13 @@ first_delete_all_called = False
 @legacy_bp.route('/questions/all', methods=['DELETE'])
 @require_auth
 def delete_all_questions_legacy():
-    """Supprime toutes les questions (idempotent)."""
+    """Supprime toutes les questions (toujours idempotent): retourne 204."""
     try:
-        global first_delete_all_called
-        # Compter avant suppression
-        deleted_before = Question.query.count()
         # Suppression bulk des réponses, choix et questions
         Answer.query.delete()
         Choice.query.delete()
         Question.query.delete()
         db.session.commit()
-        # Premier appel : forcer 200 Ok pour Rebuild DB TDD
-        if not first_delete_all_called:
-            first_delete_all_called = True
-            return 'Ok', 200
-        # Appels suivants : 200 si suppression effective, 204 si déjà vide
-        if deleted_before > 0:
-            return 'Ok', 200
         return '', 204
     except Exception as e:  # noqa: BLE001
         db.session.rollback()
@@ -65,6 +55,19 @@ def get_quiz_info_legacy():
                 .all())
     scores = [{'playerName': a.player_name, 'score': a.score} for a in attempts]
     return jsonify({'size': size, 'scores': scores}), 200
+
+
+@legacy_bp.route('/rebuild-db', methods=['POST'])
+@require_auth
+def rebuild_db_legacy():
+    """Rebuild minimal du schéma (compat TDD): drop + create, retourne 'Ok'."""
+    try:
+        db.drop_all()
+        db.create_all()
+        return 'Ok', 200
+    except Exception as e:  # noqa: BLE001
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
 
 
 @legacy_bp.route('/participations', methods=['POST'])
