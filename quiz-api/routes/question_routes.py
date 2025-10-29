@@ -185,6 +185,48 @@ def update_question(question_id):
 
                 question.position = new_pos
 
+        # Mettre à jour les champs textuels si fournis
+        if 'title' in data:
+            question.title = data.get('title') or question.title
+        if 'text' in data:
+            question.text = data.get('text') or question.text
+        if 'image' in data:
+            question.image = data.get('image')
+        if 'difficulty' in data:
+            question.difficulty = data.get('difficulty') or question.difficulty
+        if 'tags' in data:
+            try:
+                question.tags = json.dumps(data.get('tags') or [])
+            except Exception:
+                # si déjà une string JSON, conserver telle quelle
+                question.tags = data.get('tags')
+        if 'explanation' in data:
+            question.explanation = data.get('explanation')
+
+        # Remplacer entièrement les choix si fournis
+        choices_payload = None
+        if 'choices' in data:
+            choices_payload = data.get('choices') or []
+        elif 'possibleAnswers' in data:
+            choices_payload = [
+                {
+                    'text': a.get('text', ''),
+                    'is_correct': bool(a.get('isCorrect', a.get('is_correct', False)))
+                }
+                for a in (data.get('possibleAnswers') or [])
+            ]
+
+        if choices_payload is not None:
+            # supprimer les anciens choix puis réinsérer
+            Choice.query.filter_by(question_id=question_id).delete()
+            db.session.flush()
+            for c in choices_payload:
+                db.session.add(Choice(
+                    question_id=question.id,
+                    text=c.get('text', ''),
+                    is_correct=bool(c.get('is_correct', c.get('isCorrect', False)))
+                ))
+
         db.session.commit()
         # No content si succès
         return '', 204
