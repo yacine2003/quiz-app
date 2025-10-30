@@ -15,7 +15,7 @@ const quizzes: QuizCard[] = [
   {
     id: 'bases',
     numericId: 1,
-    title: 'Bases du tennis (Facile)',
+    title: 'Bases du tennis',
     description: 'Règles et notions essentielles pour débuter.',
     difficulty: 'easy'
   },
@@ -29,7 +29,7 @@ const quizzes: QuizCard[] = [
   {
     id: 'avance',
     numericId: 3,
-    title: 'Tennis avancé / technique',
+    title: 'Tennis avancé',
     description: 'Stratégies, grips, effets et notions techniques.',
     difficulty: 'hard'
   }

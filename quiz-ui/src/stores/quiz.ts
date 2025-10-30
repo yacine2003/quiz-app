@@ -21,9 +21,9 @@ export const useQuizStore = defineStore('quiz', () => {
   // Nouveaux champs (compatibilité API minimale demandée)
   const currentQuizId = quizId // alias
   const quizzes = ref<Array<{ id: string; title: string; description: string; difficulty: 'easy'|'medium'|'hard' }>>([
-    { id: 'bases', title: 'Bases du tennis (Facile)', description: 'Règles et notions essentielles pour débuter.', difficulty: 'easy' },
+    { id: 'bases', title: 'Bases du Tennis', description: 'Règles et notions essentielles pour débuter.', difficulty: 'easy' },
     { id: 'roland', title: 'Roland-Garros', description: 'Le tournoi parisien sur terre battue.', difficulty: 'medium' },
-    { id: 'avance', title: 'Tennis avancé / technique', description: 'Grips, effets et tactiques.', difficulty: 'hard' }
+    { id: 'avance', title: 'Tennis Avancé', description: 'Grips, effets et tactiques.', difficulty: 'hard' }
   ])
 
   // Persistent state (localStorage)

@@ -12,18 +12,18 @@ admin_bp = Blueprint('admin', __name__)
 def rebuild_db():
     """Supprime puis recrée le schéma et insère 3 quizzes par défaut.
 
-    - Bases du tennis (Facile) id=1
+    - Bases du tennis id=1
     - Roland-Garros id=2
-    - Tennis avancé / technique id=3
+    - Tennis avancé  id=3
     """
     try:
         db.drop_all()
         db.create_all()
 
         default_quizzes = [
-            {"id": 1, "title": "Bases du tennis (Facile)", "description": "Règles et notions essentielles pour débuter.", "difficulty": "easy"},
+            {"id": 1, "title": "Bases du tennis", "description": "Règles et notions essentielles pour débuter.", "difficulty": "easy"},
             {"id": 2, "title": "Roland-Garros", "description": "Le tournoi parisien sur terre battue.", "difficulty": "medium"},
-            {"id": 3, "title": "Tennis avancé / technique", "description": "Grips, effets et tactiques.", "difficulty": "hard"},
+            {"id": 3, "title": "Tennis avancé", "description": "Grips, effets et tactiques.", "difficulty": "hard"},
         ]
 
         for q in default_quizzes:
@@ -150,11 +150,11 @@ def bulk_insert_questions():
 
         # Crée les quizzes par défaut s'ils n'existent pas
         if not Quiz.query.get(1):
-            db.session.add(Quiz(id=1, title="Bases du tennis (Facile)", description="Règles et notions essentielles pour débuter.", difficulty="easy"))
+            db.session.add(Quiz(id=1, title="Bases du tennis", description="Règles et notions essentielles pour débuter.", difficulty="easy"))
         if not Quiz.query.get(2):
             db.session.add(Quiz(id=2, title="Roland-Garros", description="Le tournoi parisien sur terre battue.", difficulty="medium"))
         if not Quiz.query.get(3):
-            db.session.add(Quiz(id=3, title="Tennis avancé / technique", description="Grips, effets et tactiques.", difficulty="hard"))
+            db.session.add(Quiz(id=3, title="Tennis avancé", description="Grips, effets et tactiques.", difficulty="hard"))
         db.session.flush()
 
         created = 0

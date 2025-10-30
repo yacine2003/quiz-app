@@ -11,9 +11,9 @@ quiz_bp = Blueprint('quiz', __name__)
 def _ensure_default_quizzes():
     """Crée les 3 quizzes par défaut s'ils n'existent pas."""
     defaults = [
-        {"id": 1, "title": "Bases du tennis (Facile)", "description": "Règles et notions essentielles pour débuter.", "difficulty": "easy"},
+        {"id": 1, "title": "Bases du tennis", "description": "Règles et notions essentielles pour débuter.", "difficulty": "easy"},
         {"id": 2, "title": "Roland-Garros", "description": "Le tournoi parisien sur terre battue.", "difficulty": "medium"},
-        {"id": 3, "title": "Tennis avancé / technique", "description": "Grips, effets et tactiques.", "difficulty": "hard"},
+        {"id": 3, "title": "Tennis avancé", "description": "Grips, effets et tactiques.", "difficulty": "hard"},
     ]
     created = False
     for data in defaults:
@@ -113,8 +113,25 @@ def _ensure_15_per_quiz():
 
 @quiz_bp.route('', methods=['GET'])
 def get_quizzes():
-    """Liste tous les quizzes publiés et s'assure 15/15/15 prêts pour le front."""
+    """Liste tous les quizzes publiés et s'assure 15/15/15 prêts pour le front.
+
+    Normalise aussi les titres visibles par le front:
+    - 1 → "Base du tennis"
+    - 2 → "Roland-Garros" (inchangé)
+    - 3 → "Tennis Technique"
+    """
     _ensure_15_per_quiz()
+    # Normaliser les noms visibles
+    try:
+        q1 = Quiz.query.get(1)
+        if q1 and q1.title != 'Base du tennis':
+            q1.title = 'Base du tennis'
+        q3 = Quiz.query.get(3)
+        if q3 and q3.title != 'Tennis Avancé':
+            q3.title = 'Tennis Avancé'
+        db.session.commit()
+    except Exception:
+        db.session.rollback()
     quizzes = Quiz.query.filter_by(is_published=True).all()
     return jsonify([quiz.to_dict() for quiz in quizzes]), 200
 
@@ -123,6 +140,16 @@ def get_quizzes():
 def get_quiz(quiz_id):
     """Détails d'un quiz spécifique."""
     quiz = Quiz.query.get_or_404(quiz_id)
+    # Normaliser également les titres sur la page Quiz
+    try:
+        if quiz.id == 1 and quiz.title != 'Base du tennis':
+            quiz.title = 'Base du tennis'
+            db.session.commit()
+        elif quiz.id == 3 and quiz.title != 'Tennis Avancé':
+            quiz.title = 'Tennis Avancé'
+            db.session.commit()
+    except Exception:
+        db.session.rollback()
     return jsonify(quiz.to_dict(include_questions=False)), 200
 
 
