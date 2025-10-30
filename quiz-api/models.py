@@ -62,13 +62,24 @@ class Question(db.Model):
         import json
         data = {
             'id': self.id,
+            'quiz_id': self.quiz_id,
             'position': self.position,
             'title': self.title,
             'text': self.text,
             'image': self.image,
             'difficulty': self.difficulty,
             'tags': json.loads(self.tags) if self.tags else [],
-            'possibleAnswers': [c.to_dict(include_correct) for c in self.choices]
+            # Legacy pour TDD
+            'possibleAnswers': [c.to_dict(include_correct) for c in self.choices],
+            # Alias pour le front moderne
+            'choices': [
+                {
+                    'id': c.id,
+                    'text': c.text,
+                    'is_correct': bool(c.is_correct) if include_correct else False
+                }
+                for c in self.choices
+            ]
         }
         if include_correct and self.explanation:
             data['explanation'] = self.explanation

@@ -1,6 +1,6 @@
 """Routes pour les quizzes."""
 from flask import Blueprint, request, jsonify
-from models import db, Quiz, Question, Choice
+from models import db, Quiz, Question, Choice, Answer
 from middleware import require_auth
 import os
 import json
@@ -24,11 +24,12 @@ def _ensure_default_quizzes():
         db.session.commit()
 
 
-def _auto_restore_questions_if_empty():
-    """Si les 3 quizzes par défaut sont vides, restaure depuis data/questions.json.
+def _ensure_15_per_quiz():
+    """Garantit 15 questions pour chacun des quizzes 1/2/3.
 
-    Objectif: garantir que le front affiche toujours 15/15/15 (easy/medium/hard)
-    même si des tests TDD ont vidé la base.
+    Si la répartition actuelle est différente, on réinitialise proprement les
+    questions/choix des quizzes 1..3 à partir de data/questions.json, en
+    distribuant 15 'easy'→1, 15 'medium'→2, 15 'hard'→3 (ou via alias quizId).
     """
     _ensure_default_quizzes()
     counts = {
@@ -36,30 +37,53 @@ def _auto_restore_questions_if_empty():
         2: Question.query.filter_by(quiz_id=2).count(),
         3: Question.query.filter_by(quiz_id=3).count(),
     }
-    if counts[1] == 0 and counts[2] == 0 and counts[3] == 0:
-        # Charger le fichier JSON canonical
-        repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
-        json_path = os.path.join(repo_root, 'data', 'questions.json')
-        if not os.path.exists(json_path):
-            return  # rien à faire
-        try:
-            with open(json_path, 'r', encoding='utf-8') as f:
-                raw = json.load(f)
-        except Exception:
-            return
+    if counts[1] == 15 and counts[2] == 15 and counts[3] == 15:
+        return
 
-        # Positions par quiz
-        next_pos = {1: 1, 2: 1, 3: 1}
-        for item in (raw or []):
+    repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
+    json_path = os.path.join(repo_root, 'data', 'questions.json')
+    if not os.path.exists(json_path):
+        return
+    try:
+        with open(json_path, 'r', encoding='utf-8') as f:
+            raw = json.load(f) or []
+    except Exception:
+        return
+
+    # Séparer par quiz cible
+    buckets = {1: [], 2: [], 3: []}
+    for item in raw:
+        alias = str(item.get('quizId', '')).strip().lower()
+        if alias in ('bases', 'base', 'facile', 'easy'):
+            target_quiz, difficulty = 1, 'easy'
+        elif alias in ('roland', 'moyen', 'medium'):
+            target_quiz, difficulty = 2, 'medium'
+        elif alias in ('avance', 'avancé', 'hard', 'difficile'):
+            target_quiz, difficulty = 3, 'hard'
+        else:
             difficulty = str(item.get('difficulty', 'easy')).lower().strip()
             target_quiz = 1 if difficulty == 'easy' else 2 if difficulty == 'medium' else 3
+        buckets[target_quiz].append((item, difficulty))
 
-            title = item.get('title') or item.get('question') or f"Question {next_pos[target_quiz]}"
+    # Purge propre des questions/choices/answers des quizzes 1..3
+    qids = [q.id for q in Question.query.filter(Question.quiz_id.in_([1, 2, 3])).all()]
+    if qids:
+        Answer.query.filter(Answer.question_id.in_(qids)).delete(synchronize_session=False)
+        Choice.query.filter(Choice.question_id.in_(qids)).delete(synchronize_session=False)
+        for q in Question.query.filter(Question.id.in_(qids)).all():
+            db.session.delete(q)
+        db.session.flush()
+
+    # Insérer 15 questions par quiz
+    for quiz_id in (1, 2, 3):
+        items = buckets.get(quiz_id, [])[:15]
+        pos = 1
+        for item, difficulty in items:
+            title = item.get('title') or item.get('question') or f"Question {pos}"
             text = item.get('text') or item.get('question') or title
-
             q = Question(
-                quiz_id=target_quiz,
-                position=next_pos[target_quiz],
+                quiz_id=quiz_id,
+                position=pos,
                 title=title,
                 text=text,
                 difficulty=difficulty,
@@ -67,7 +91,6 @@ def _auto_restore_questions_if_empty():
             db.session.add(q)
             db.session.flush()
 
-            # choices: dict {A:..., B:...} + correct; ou liste [{text,is_correct}]
             if isinstance(item.get('choices'), dict):
                 correct_letter = (item.get('correct') or '').strip()
                 for letter in ['A', 'B', 'C', 'D']:
@@ -84,16 +107,14 @@ def _auto_restore_questions_if_empty():
                         text=c.get('text', ''),
                         is_correct=bool(c.get('is_correct', False)),
                     ))
-
-            next_pos[target_quiz] += 1
-
-        db.session.commit()
+            pos += 1
+    db.session.commit()
 
 
 @quiz_bp.route('', methods=['GET'])
 def get_quizzes():
-    """Liste tous les quizzes publiés, avec auto-restauration si nécessaire."""
-    _auto_restore_questions_if_empty()
+    """Liste tous les quizzes publiés et s'assure 15/15/15 prêts pour le front."""
+    _ensure_15_per_quiz()
     quizzes = Quiz.query.filter_by(is_published=True).all()
     return jsonify([quiz.to_dict() for quiz in quizzes]), 200
 
