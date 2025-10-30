@@ -17,7 +17,7 @@ def get_leaderboard(quiz_id):
     # Trié par score DESC, puis temps ASC (le plus rapide gagne en cas d'égalité)
     attempts = (Attempt.query
                 .filter_by(quiz_id=quiz_id)
-                .order_by(desc(Attempt.score), Attempt.time_spent.asc(), desc(Attempt.created_at))
+                .order_by(desc(Attempt.score), Attempt.time_spent.asc(), Attempt.created_at.asc())
                 .limit(limit)
                 .all())
     
@@ -31,7 +31,7 @@ def get_global_leaderboard():
     limit = min(limit, 100)
     
     attempts = (Attempt.query
-                .order_by(desc(Attempt.score), Attempt.time_spent.asc(), desc(Attempt.created_at))
+                .order_by(desc(Attempt.score), Attempt.time_spent.asc(), Attempt.created_at.asc())
                 .limit(limit)
                 .all())
     

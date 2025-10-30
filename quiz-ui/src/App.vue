@@ -9,8 +9,8 @@ import { RouterView } from 'vue-router'
     <Header />
     <ProgressBar />
     <RouterView v-slot="{ Component }">
-      <Transition name="fade" mode="out-in">
-        <component :is="Component" />
+      <Transition name="fade">
+        <component :is="Component" :key="$route.fullPath" />
       </Transition>
     </RouterView>
   </div>
