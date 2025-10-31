@@ -47,6 +47,7 @@ def import_questions(json_file_path):
                 position=idx,
                 title=f"Question {idx}",
                 text=q_data['question'],
+                image=q_data.get('image'),  # Ajouter le champ image
                 difficulty=q_data.get('difficulty', 'easy'),
                 tags=json.dumps(q_data.get('tags', [])),
                 explanation=q_data.get('explanation', '')
