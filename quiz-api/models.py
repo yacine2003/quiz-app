@@ -62,13 +62,24 @@ class Question(db.Model):
         import json
         data = {
             'id': self.id,
+            'quiz_id': self.quiz_id,
             'position': self.position,
             'title': self.title,
             'text': self.text,
             'image': self.image,
             'difficulty': self.difficulty,
             'tags': json.loads(self.tags) if self.tags else [],
-            'choices': [c.to_dict(include_correct) for c in self.choices]
+            # Legacy pour TDD
+            'possibleAnswers': [c.to_dict(include_correct) for c in self.choices],
+            # Alias pour le front moderne
+            'choices': [
+                {
+                    'id': c.id,
+                    'text': c.text,
+                    'is_correct': bool(c.is_correct) if include_correct else False
+                }
+                for c in self.choices
+            ]
         }
         if include_correct and self.explanation:
             data['explanation'] = self.explanation
@@ -89,14 +100,12 @@ class Choice(db.Model):
     answers = db.relationship('Answer', backref='choice', lazy='dynamic')
     
     def to_dict(self, include_correct=False):
-        """Convertit en dictionnaire. include_correct pour révéler la bonne réponse."""
-        data = {
+        """Convertit en dictionnaire. Expose toujours 'isCorrect' (false par défaut)."""
+        return {
             'id': self.id,
-            'text': self.text
+            'text': self.text,
+            'isCorrect': bool(self.is_correct) if include_correct else False
         }
-        if include_correct:
-            data['is_correct'] = self.is_correct
-        return data
 
 
 class Attempt(db.Model):
