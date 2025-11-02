@@ -7,6 +7,11 @@ import { useLocalStorage } from '@vueuse/core'
 import type { Question, Answer, AttemptRequest } from '@/types/models'
 import { fetchQuestions, submitAttempt } from '@/services/api'
 
+function buildImageUrl(position: number, difficulty: 'easy' | 'medium' | 'hard'): string {
+  const suffix = difficulty === 'easy' ? 'base' : difficulty
+  return `/images/questions/q${position}${suffix}.png`
+}
+
 export const useQuizStore = defineStore('quiz', () => {
   // State
   const quizId = ref<number>(0)
@@ -83,7 +88,14 @@ export const useQuizStore = defineStore('quiz', () => {
 
     // Récupérer les questions depuis l'API
     const data = await fetchQuestions(id)
-    questions.value = data.sort((a, b) => a.position - b.position)
+    const computedDifficulty: 'easy' | 'medium' | 'hard' = id === 1 ? 'easy' : id === 2 ? 'medium' : 'hard'
+    questions.value = data
+      .sort((a, b) => a.position - b.position)
+      .map((q) => ({
+        ...q,
+        difficulty: computedDifficulty,
+        image: buildImageUrl(q.position, computedDifficulty)
+      }))
 
     // Vérifier s'il y a une progression sauvegardée
     if (savedProgress.value.quizId === id) {
