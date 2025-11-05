@@ -35,6 +35,12 @@ onMounted(async () => {
   if (questionId && questionId !== 'new') {
     isEditMode.value = true
     await loadQuestion(Number(questionId))
+  } else {
+    // Si on crée une question depuis un quiz, pré-remplir le quiz_id
+    const quizIdParam = route.query.quiz_id
+    if (quizIdParam) {
+      localQuestion.value.quiz_id = Number(quizIdParam)
+    }
   }
 })
 
@@ -139,7 +145,14 @@ async function handleSave() {
       // Création
       const result = await apiClient.createQuestion(localQuestion.value)
       alert('Question créée avec succès')
-      router.push(`/admin/questions/${result.id}`)
+      
+      // Si on vient d'un quiz, retourner vers ce quiz
+      const quizIdParam = route.query.quiz_id
+      if (quizIdParam) {
+        router.push(`/admin/quizzes/${quizIdParam}`)
+      } else {
+        router.push(`/admin/questions/${result.id}`)
+      }
     }
   } catch (error: any) {
     console.error('Erreur lors de la sauvegarde:', error)
@@ -153,7 +166,13 @@ function handleCancel() {
   if (isEditMode.value && route.params.id) {
     router.push(`/admin/questions/${route.params.id}`)
   } else {
-    router.push('/admin')
+    // Si on vient d'un quiz, retourner vers ce quiz
+    const quizIdParam = route.query.quiz_id
+    if (quizIdParam) {
+      router.push(`/admin/quizzes/${quizIdParam}`)
+    } else {
+      router.push('/admin')
+    }
   }
 }
 
@@ -169,9 +188,14 @@ function handleLogout() {
     <header class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-40">
       <div class="max-w-4xl mx-auto px-6 py-4">
         <div class="flex items-center justify-between">
-          <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
-            {{ isEditMode ? 'Éditer la question' : 'Créer une question' }}
-          </h1>
+          <div>
+            <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
+              {{ isEditMode ? 'Éditer la question' : 'Créer une question' }}
+            </h1>
+            <p v-if="!isEditMode && route.query.quiz_id" class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+              Pour le Quiz {{ route.query.quiz_id }}
+            </p>
+          </div>
           <button 
             @click="handleLogout"
             class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center gap-2"
@@ -196,12 +220,16 @@ function handleLogout() {
             </label>
             <select 
               v-model.number="localQuestion.quiz_id"
-              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+              :disabled="!!route.query.quiz_id"
+              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <option :value="1">1 - Bases du tennis</option>
               <option :value="2">2 - Roland-Garros</option>
               <option :value="3">3 - Tennis avancé</option>
             </select>
+            <p v-if="route.query.quiz_id" class="text-xs text-blue-600 dark:text-blue-400 mt-1">
+              Cette question sera ajoutée au Quiz {{ route.query.quiz_id }}
+            </p>
           </div>
 
           <div>
