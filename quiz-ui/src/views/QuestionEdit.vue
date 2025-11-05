@@ -12,9 +12,12 @@ const uploadedImagePreview = ref<string>('')
 // Mode: 'create' ou 'edit'
 const isEditMode = ref(false)
 
+// Lire le quiz_id depuis l'URL dès le départ
+const initialQuizId = route.query.quiz_id ? Number(route.query.quiz_id) : 1
+
 // Copie locale de la question (principe des props)
 const localQuestion = ref<Partial<Question>>({
-  quiz_id: 1,
+  quiz_id: initialQuizId,
   position: 1,
   title: '',
   text: '',
@@ -35,13 +38,8 @@ onMounted(async () => {
   if (questionId && questionId !== 'new') {
     isEditMode.value = true
     await loadQuestion(Number(questionId))
-  } else {
-    // Si on crée une question depuis un quiz, pré-remplir le quiz_id
-    const quizIdParam = route.query.quiz_id
-    if (quizIdParam) {
-      localQuestion.value.quiz_id = Number(quizIdParam)
-    }
   }
+  // Note: Le quiz_id est déjà initialisé depuis l'URL dans la déclaration de localQuestion
 })
 
 async function loadQuestion(id: number) {
