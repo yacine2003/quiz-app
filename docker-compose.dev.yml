@@ -1,0 +1,63 @@
+version: '3.8'
+
+services:
+  # Backend Flask API en mode dev avec hot-reload
+  api:
+    build:
+      context: ./quiz-api
+      dockerfile: Dockerfile
+    container_name: quiz-api-dev
+    ports:
+      - "5001:5001"
+    environment:
+      - FLASK_ENV=development
+      - FLASK_DEBUG=1
+      - PORT=5001
+      - DATABASE_URL=sqlite:////app/data/quiz.db
+      - CORS_ORIGINS=http://localhost:3000,http://localhost:5173,http://localhost:80
+    volumes:
+      # Bind mount du code source pour hot-reload
+      - ./quiz-api:/app
+      # Volume partagé pour la base et les données
+      - quiz-data:/app/data
+    networks:
+      - quiz-network
+    command: python app_new.py
+    restart: unless-stopped
+
+  # Frontend Vue en mode dev avec Vite hot-reload
+  frontend-dev:
+    build:
+      context: ./quiz-ui
+      dockerfile: Dockerfile.dev
+      args:
+        - VITE_API_URL=http://localhost:5001/api
+    container_name: quiz-frontend-dev
+    ports:
+      - "3000:3000"
+      - "5173:5173"  # Port alternatif Vite
+    environment:
+      - VITE_API_URL=http://localhost:5001/api
+      - CHOKIDAR_USEPOLLING=true  # Pour que le watch fonctionne avec bind mount
+    volumes:
+      # Bind mount du code source pour hot-reload
+      - ./quiz-ui:/app
+      # Exclure node_modules (utiliser celui du container)
+      - /app/node_modules
+      # Bind mount des assets publics
+      - ./quiz-ui/public:/app/public
+    depends_on:
+      - api
+    networks:
+      - quiz-network
+    command: npm run dev -- --host 0.0.0.0 --port 3000
+    restart: unless-stopped
+
+volumes:
+  quiz-data:
+    driver: local
+
+networks:
+  quiz-network:
+    driver: bridge
+

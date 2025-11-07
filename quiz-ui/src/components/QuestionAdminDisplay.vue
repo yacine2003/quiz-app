@@ -28,6 +28,14 @@ const difficultyLabel = computed(() => {
   }
   return labels[props.question.difficulty] || 'Facile'
 })
+
+// Fallback image (au cas où l'API renverrait image = null)
+const adminImageSrc = computed(() => {
+  const q = props.question
+  const diff = (q.difficulty || 'easy').toLowerCase()
+  const suffix = diff === 'easy' ? 'base' : diff
+  return q.image || `/images/questions/q${q.position}${suffix}.png`
+})
 </script>
 
 <template>
@@ -80,9 +88,9 @@ const difficultyLabel = computed(() => {
     </p>
 
     <!-- Image preview -->
-    <div v-if="question.image" class="mb-3">
+    <div v-if="adminImageSrc" class="mb-3">
       <img 
-        :src="question.image" 
+        :src="adminImageSrc" 
         :alt="question.title"
         class="max-h-32 rounded border border-gray-200 dark:border-gray-700"
       />

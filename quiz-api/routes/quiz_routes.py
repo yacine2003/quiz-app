@@ -86,12 +86,16 @@ def _ensure_15_per_quiz():
         for item, difficulty in items:
             title = item.get('title') or item.get('question') or f"Question {pos}"
             text = item.get('text') or item.get('question') or title
+            # Construire l'URL de l'image selon quiz_id et position
+            image_suffix = 'base' if difficulty == 'easy' else difficulty
+            image_url = item.get('image') or f"/images/questions/q{pos}{image_suffix}.png"
             q = Question(
                 quiz_id=quiz_id,
                 position=pos,
                 title=title,
                 text=text,
                 difficulty=difficulty,
+                image=image_url,
             )
             db.session.add(q)
             db.session.flush()
