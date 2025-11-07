@@ -14,8 +14,7 @@ const percent = computed(() => {
   <!-- Utilise la hauteur du header via --header-offset définie dans Header.vue -->
   <div class="sticky" :style="{ top: `var(--header-offset, 56px)` }" style="z-index: 40;">
     <div
-      class="h-[2px] w-full"
-      :class="['bg-white/75 dark:bg-gray-900/70']"
+      class="h-[2px] w-full bg-[var(--border)]"
       role="progressbar"
       :aria-valuemin="0"
       :aria-valuemax="100"
@@ -23,7 +22,7 @@ const percent = computed(() => {
       aria-label="Progression du quiz"
     >
       <div
-        class="h-full bg-white/75 dark:bg-gray-900/70 transition-[width] duration-150"
+        class="h-full bg-[var(--accent)] transition-[width] duration-150"
         :style="{ width: `${percent}%` }"
       />
     </div>

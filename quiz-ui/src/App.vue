@@ -5,7 +5,7 @@ import { RouterView } from 'vue-router'
 </script>
 
 <template>
-  <div id="app" class="min-h-screen bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100">
+  <div id="app" class="min-h-screen bg-[var(--bg)] text-[var(--text)]">
     <Header />
     <ProgressBar />
     <RouterView v-slot="{ Component }">

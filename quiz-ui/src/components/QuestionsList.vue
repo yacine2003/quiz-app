@@ -86,7 +86,7 @@ const quizStats = computed(() => {
         </button>
         <button 
           @click="emit('create')"
-          class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
+          class="px-4 py-2 bg-[var(--accent)] text-white rounded-lg hover:bg-[var(--accent-hover)] transition-colors flex items-center gap-2"
         >
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
@@ -107,7 +107,7 @@ const quizStats = computed(() => {
           :class="[
             'px-4 py-2 rounded-lg text-sm font-medium transition-colors',
             filterQuizId === stat.id
-              ? 'bg-blue-600 text-white'
+              ? 'bg-[var(--accent)] text-white'
               : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
           ]"
         >
@@ -139,7 +139,7 @@ const quizStats = computed(() => {
 
     <!-- Loading state -->
     <div v-if="loading" class="text-center py-12">
-      <div class="inline-block w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+      <div class="inline-block w-8 h-8 border-4 border-[var(--accent)] border-t-transparent rounded-full animate-spin"></div>
       <p class="text-gray-600 dark:text-gray-400 mt-4">Chargement des questions...</p>
     </div>
 
@@ -151,7 +151,7 @@ const quizStats = computed(() => {
       <p class="text-gray-600 dark:text-gray-400 text-lg">Aucune question trouvée</p>
       <button 
         @click="emit('create')"
-        class="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+        class="mt-4 px-4 py-2 bg-[var(--accent)] text-white rounded-lg hover:bg-[var(--accent-hover)] transition-colors"
       >
         Créer la première question
       </button>

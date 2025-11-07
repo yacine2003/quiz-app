@@ -1,21 +1,68 @@
 /* Import UnoCSS reset */
 @import '@unocss/reset/tailwind.css';
 
-/* Variables CSS personnalisées */
+/* Variables CSS – Thèmes */
 :root {
-  --color-primary: #0ea5e9;
-  --color-primary-dark: #0284c7;
-  --color-success: #10b981;
-  --color-warning: #f59e0b;
-  --color-error: #ef4444;
-  
+  /* Light (par défaut) */
+  --bg: #ffffff;
+  --surface: #ffffff;
+  --surface-alt: #f7fafc;
+  --border: #e5e7eb;
+  --text: #111827;
+  --text-muted: #6b7280;
+  --accent: #0369a1;         /* bleu */
+  --accent-hover: #075985;
+  --ring: #93c5fd;
+
   --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
   --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
   --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
   --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1);
-  
+
   --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
   --transition-base: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Thème sombre “noir” */
+[data-theme="dark"] {
+  --bg: #000000;
+  --surface: #0a0a0a;
+  --surface-alt: #111111;
+  --border: #262626;
+  --text: #ffffff;
+  --text-muted: #d1d5db;
+  --accent: #3b82f6;
+  --accent-hover: #2563eb;
+  --ring: #60a5fa;
+}
+
+/* Forcer une lisibilité maximale en sombre: texte par défaut en blanc */
+[data-theme="dark"] body,
+[data-theme="dark"] h1,
+[data-theme="dark"] h2,
+[data-theme="dark"] h3,
+[data-theme="dark"] h4,
+[data-theme="dark"] h5,
+[data-theme="dark"] h6,
+[data-theme="dark"] p,
+[data-theme="dark"] li,
+[data-theme="dark"] label,
+[data-theme="dark"] span,
+[data-theme="dark"] a {
+  color: #ffffff !important;
+}
+
+/* Thème Roland‑Garros */
+[data-theme="rg"] {
+  --bg: #f5efe6;            /* crème */
+  --surface: #ffffff;
+  --surface-alt: #faf7f1;
+  --border: #e6dfd4;
+  --text: #1a1a1a;
+  --text-muted: #5b5b5b;
+  --accent: #cc4e1f;        /* terre battue */
+  --accent-hover: #b1451b;
+  --ring: #2a6b3d;          /* vert RG */
 }
 
 /* Dark mode */
@@ -83,18 +130,13 @@ html {
 body {
   margin: 0;
   min-height: 100vh;
-  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
-}
-
-@media (prefers-color-scheme: dark) {
-  body {
-    background: linear-gradient(135deg, #0c4a6e 0%, #075985 100%);
-  }
+  background: var(--bg);
+  color: var(--text);
 }
 
 /* Focus styles pour accessibilité */
 :focus-visible {
-  outline: 2px solid var(--color-primary);
+  outline: 2px solid var(--ring);
   outline-offset: 2px;
 }
 
