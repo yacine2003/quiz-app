@@ -46,8 +46,42 @@ const router = createRouter({
     {
       path: '/admin',
       name: 'admin',
-      component: () => import('@/views/Admin.vue'),
-      meta: { requiresAuth: true }
+      component: () => import('@/views/Admin.vue')
+      // Note: L'authentification est gérée dans le composant Admin.vue lui-même
+    },
+    {
+      path: '/admin/questions/new',
+      name: 'question-create',
+      component: () => import('@/views/QuestionEdit.vue')
+    },
+    {
+      path: '/admin/questions/:id',
+      name: 'question-detail',
+      component: () => import('@/views/QuestionDetail.vue'),
+      props: (route) => ({ id: Number(route.params.id) })
+    },
+    {
+      path: '/admin/questions/:id/edit',
+      name: 'question-edit',
+      component: () => import('@/views/QuestionEdit.vue'),
+      props: (route) => ({ id: Number(route.params.id) })
+    },
+    {
+      path: '/admin/quizzes/new',
+      name: 'quiz-create',
+      component: () => import('@/views/QuizEdit.vue')
+    },
+    {
+      path: '/admin/quizzes/:id',
+      name: 'quiz-detail',
+      component: () => import('@/views/QuizDetail.vue'),
+      props: (route) => ({ id: Number(route.params.id) })
+    },
+    {
+      path: '/admin/quizzes/:id/edit',
+      name: 'quiz-edit',
+      component: () => import('@/views/QuizEdit.vue'),
+      props: (route) => ({ id: Number(route.params.id) })
     },
     {
       path: '/:pathMatch(.*)*',
@@ -83,14 +117,8 @@ router.beforeEach((to, from, next) => {
     }
   }
 
-  // Vérifier l'authentification admin
-  if (to.meta.requiresAuth) {
-    const token = localStorage.getItem('auth_token')
-    if (!token) {
-      next({ name: 'home' })
-      return
-    }
-  }
+  // Note: L'authentification admin est gérée dans Admin.vue
+  // Pas de guard ici pour permettre l'accès au formulaire de connexion
 
   next()
 })

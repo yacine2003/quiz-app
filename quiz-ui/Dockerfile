@@ -31,4 +31,5 @@ RUN npm run build
 # Nginx dans lequel nous copions les fichiers générés par la portion "build"
 FROM nginx
 COPY --from=build /app/dist /usr/share/nginx/html
+COPY nginx.conf /etc/nginx/nginx.conf
 

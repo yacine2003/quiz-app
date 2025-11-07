@@ -6,6 +6,7 @@ import { createPinia } from 'pinia'
 import { VueQueryPlugin } from '@tanstack/vue-query'
 import App from './App.vue'
 import router from './router'
+import { useThemeStore } from './stores/theme'
 
 // Import UnoCSS
 import 'uno.css'
@@ -29,6 +30,10 @@ app.use(VueQueryPlugin, {
     }
   }
 })
+
+// Initialiser le thème AVANT le montage pour éviter le FOUC
+const themeStore = useThemeStore()
+themeStore.init()
 
 app.mount('#app')
 

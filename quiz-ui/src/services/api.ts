@@ -46,6 +46,20 @@ class ApiClient {
     return response.data
   }
 
+  async createQuiz(data: Partial<Quiz>): Promise<Quiz> {
+    const response = await this.client.post('/quizzes', data)
+    return response.data
+  }
+
+  async updateQuiz(id: number, data: Partial<Quiz>): Promise<Quiz> {
+    const response = await this.client.put(`/quizzes/${id}`, data)
+    return response.data
+  }
+
+  async deleteQuiz(id: number): Promise<void> {
+    await this.client.delete(`/quizzes/${id}`)
+  }
+
   // Questions
   async fetchQuestions(quizId: number): Promise<Question[]> {
     const response = await this.client.get('/questions', {
@@ -83,6 +97,30 @@ class ApiClient {
   // Auth
   async login(password: string): Promise<{ token: string }> {
     const response = await this.client.post('/auth/login', { password })
+    return response.data
+  }
+
+  // Admin - Questions CRUD
+  async createQuestion(data: Partial<Question>): Promise<{ id: number }> {
+    const response = await this.client.post('/questions', data)
+    return response.data
+  }
+
+  async updateQuestion(id: number, data: Partial<Question>): Promise<void> {
+    await this.client.put(`/questions/${id}`, data)
+  }
+
+  async deleteQuestion(id: number): Promise<void> {
+    await this.client.delete(`/questions/${id}`)
+  }
+
+  async fetchAllQuestions(): Promise<Question[]> {
+    const response = await this.client.get('/questions')
+    return response.data
+  }
+
+  async fetchQuestionById(id: number): Promise<Question> {
+    const response = await this.client.get(`/questions/${id}`)
     return response.data
   }
 }

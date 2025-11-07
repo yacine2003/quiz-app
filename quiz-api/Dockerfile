@@ -26,5 +26,5 @@ COPY . .
 LABEL maintainer="Housny Yacine <housny.yacine@esiee.fr>" \
     version="1.0"
 
-# Commande de démarrage du serveur gunicorn
-CMD ["gunicorn", "--bind", "0.0.0.0:5000", "app:app", "--log-level", "info", "--error-logfile", "-", "--access-logfile", "-"]
+# Commande de démarrage du serveur gunicorn (app factory)
+CMD ["gunicorn", "--bind", "0.0.0.0:5001", "app_new:create_app()", "--log-level", "info", "--error-logfile", "-", "--access-logfile", "-"]

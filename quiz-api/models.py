@@ -60,13 +60,17 @@ class Question(db.Model):
     def to_dict(self, include_correct=False):
         """Convertit en dictionnaire. include_correct pour admin seulement."""
         import json
+        # Fallback image si absente en base: construit à partir de position + difficulté
+        difficulty = (self.difficulty or 'easy').lower()
+        suffix = 'base' if difficulty == 'easy' else difficulty
+        image_url = self.image or f"/images/questions/q{self.position}{suffix}.png"
         data = {
             'id': self.id,
             'quiz_id': self.quiz_id,
             'position': self.position,
             'title': self.title,
             'text': self.text,
-            'image': self.image,
+            'image': image_url,
             'difficulty': self.difficulty,
             'tags': json.loads(self.tags) if self.tags else [],
             # Legacy pour TDD

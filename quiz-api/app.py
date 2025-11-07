@@ -75,6 +75,11 @@ def get_quiz_info():
     return {"size": size, "scores": []}, 200
 
 
+@app.route('/health')
+def health():
+    return {"status": "healthy"}, 200
+
+
 # ---------------------------
 # Endpoints Questions
 # ---------------------------

@@ -57,6 +57,17 @@ Variables d'environnement (`.env.local`) :
 VITE_API_URL=http://localhost:5001/api
 ```
 
+## Thèmes (Light, Sombre noir, Roland‑Garros)
+
+- Sélecteur de thème dans le Header (Clair / Sombre (noir) / Roland‑Garros).
+- Persistance via localStorage (`quiz-theme`).
+- Les couleurs sont centralisées via variables CSS:
+  - Light (par défaut) → `:root`
+  - Dark noir → `[data-theme="dark"]`
+  - Roland‑Garros → `[data-theme="rg"]`
+
+Pour ajouter un 4e thème, ajoutez une section `[data-theme="nom"]` dans `src/assets/main.css` et appelez `useThemeStore().setTheme('nom')`.
+
 ## Features
 
 - 🎨 Design moderne avec UnoCSS

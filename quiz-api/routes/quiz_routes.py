@@ -40,9 +40,14 @@ def _ensure_15_per_quiz():
     if counts[1] == 15 and counts[2] == 15 and counts[3] == 15:
         return
 
-    repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
-    json_path = os.path.join(repo_root, 'data', 'questions.json')
-    if not os.path.exists(json_path):
+    # Résoudre de manière robuste l’emplacement du fichier questions.json
+    candidates = [
+        os.path.join(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')), 'data', 'questions.json'),  # /app/data/questions.json
+        os.path.join(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')), 'data', 'questions.json'),  # /data/questions.json (au cas où)
+        os.path.join('/app', 'data', 'questions.json'),
+    ]
+    json_path = next((p for p in candidates if os.path.exists(p)), None)
+    if not json_path:
         return
     try:
         with open(json_path, 'r', encoding='utf-8') as f:
@@ -81,12 +86,16 @@ def _ensure_15_per_quiz():
         for item, difficulty in items:
             title = item.get('title') or item.get('question') or f"Question {pos}"
             text = item.get('text') or item.get('question') or title
+            # Construire l'URL de l'image selon quiz_id et position
+            image_suffix = 'base' if difficulty == 'easy' else difficulty
+            image_url = item.get('image') or f"/images/questions/q{pos}{image_suffix}.png"
             q = Question(
                 quiz_id=quiz_id,
                 position=pos,
                 title=title,
                 text=text,
                 difficulty=difficulty,
+                image=image_url,
             )
             db.session.add(q)
             db.session.flush()

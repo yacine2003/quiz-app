@@ -15,12 +15,12 @@ services:
       - DATABASE_URL=sqlite:////app/data/quiz.db
       - CORS_ORIGINS=http://localhost:3000,http://localhost:80
     volumes:
-      - quiz-data:/app/data
+      - ./data:/app/data
     networks:
       - quiz-network
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:5001/health"]
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:5001/health"]
       interval: 30s
       timeout: 10s
       retries: 3

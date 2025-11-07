@@ -2,7 +2,7 @@
 import { onMounted, onBeforeUnmount, ref, computed, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useQuizStore } from '@/stores/quiz'
-import { useDark, useToggle } from '@vueuse/core'
+import { useThemeStore, type ThemeName } from '@/stores/theme'
 
 // Router & Store
 const router = useRouter()
@@ -94,9 +94,16 @@ const current = computed(() => (total.value ? quiz.currentIndex + 1 : 0))
 const elapsed = computed(() => quiz.timeSpent || 0)
 const statusText = computed(() => `Joueur: ${player.value} · Q${Math.min(current.value, total.value || 0)}/${total.value || 0} · ${elapsed.value}s`)
 
-// Dark mode toggle
-const isDark = useDark({ storageKey: 'quiz-color-scheme' })
-const toggleDark = useToggle(isDark)
+// Theme store
+const theme = useThemeStore()
+const themeLabel = computed(() => {
+  return theme.current === 'light'
+    ? 'Clair'
+    : theme.current === 'dark'
+      ? 'Sombre (noir)'
+      : 'Roland‑Garros'
+})
+const setTheme = (t: ThemeName) => theme.setTheme(t)
 
 onMounted(() => {
   updateHeaderOffset()
@@ -116,7 +123,7 @@ watch(isShrunk, () => updateHeaderOffset())
 <template>
   <header
     ref="headerRef"
-    class="sticky top-0 z-50 backdrop-blur bg-white/75 dark:bg-gray-900/70 border-b border-gray-200 dark:border-gray-800 transition-[padding] duration-150"
+    class="sticky top-0 z-50 backdrop-blur border-b transition-[padding] duration-150 bg-[color-mix(in_srgb,var(--surface)_85%,transparent)] border-[var(--border)]"
     :class="isShrunk ? 'py-2' : 'py-3'"
     role="banner"
   >
@@ -125,7 +132,7 @@ watch(isShrunk, () => updateHeaderOffset())
       <div class="flex items-center gap-3">
         <button
           type="button"
-          class="text-xl font-bold text-gray-900 dark:text-white hover:opacity-80 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 rounded"
+          class="text-xl font-bold text-[var(--text)] hover:opacity-80 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] rounded"
           aria-label="Aller à l’accueil"
           @click="goHome"
         >
@@ -141,34 +148,34 @@ watch(isShrunk, () => updateHeaderOffset())
       >
         <router-link
           to="/"
-          class="px-1 py-1 rounded focus-visible:ring-2 focus-visible:ring-primary-500"
-          :class="route.path === '/' ? 'text-primary-700 dark:text-primary-300 underline underline-offset-4' : 'text-gray-700 dark:text-gray-200 hover:text-gray-900 dark:hover:text-white'"
+          class="px-1 py-1 rounded focus-visible:ring-2 focus-visible:ring-[var(--ring)]"
+          :class="route.path === '/' ? 'text-[var(--accent)] underline underline-offset-4' : 'text-[var(--text)] hover:text-[var(--accent)]'"
           :aria-current="route.path === '/' ? 'page' : undefined"
         >Accueil</router-link>
 
         <router-link
           to="/quiz"
-          class="px-1 py-1 rounded focus-visible:ring-2 focus-visible:ring-primary-500"
-          :class="route.path === '/quiz' ? 'text-primary-700 dark:text-primary-300 underline underline-offset-4' : 'text-gray-700 dark:text-gray-200 hover:text-gray-900 dark:hover:text-white'"
+          class="px-1 py-1 rounded focus-visible:ring-2 focus-visible:ring-[var(--ring)]"
+          :class="route.path === '/quiz' ? 'text-[var(--accent)] underline underline-offset-4' : 'text-[var(--text)] hover:text-[var(--accent)]'"
           :aria-current="route.path === '/quiz' ? 'page' : undefined"
         >Quiz</router-link>
 
         <router-link
           to="/quiz/1/leaderboard"
-          class="px-1 py-1 rounded focus-visible:ring-2 focus-visible:ring-primary-500"
-          :class="(route.path.startsWith('/quiz') && route.path.includes('/leaderboard')) ? 'text-primary-700 dark:text-primary-300 underline underline-offset-4' : 'text-gray-700 dark:text-gray-200 hover:text-gray-900 dark:hover:text-white'"
+          class="px-1 py-1 rounded focus-visible:ring-2 focus-visible:ring-[var(--ring)]"
+          :class="(route.path.startsWith('/quiz') && route.path.includes('/leaderboard')) ? 'text-[var(--accent)] underline underline-offset-4' : 'text-[var(--text)] hover:text-[var(--accent)]'"
           :aria-current="(route.path.startsWith('/quiz') && route.path.includes('/leaderboard')) ? 'page' : undefined"
         >Classement</router-link>
 
         <router-link
           to="/admin"
-          class="px-1 py-1 rounded focus-visible:ring-2 focus-visible:ring-primary-500"
-          :class="(route.path.startsWith('/admin')) ? 'text-primary-700 dark:text-primary-300 underline underline-offset-4' : 'text-gray-700 dark:text-gray-200 hover:text-gray-900 dark:hover:text-white'"
+          class="px-1 py-1 rounded focus-visible:ring-2 focus-visible:ring-[var(--ring)]"
+          :class="(route.path.startsWith('/admin')) ? 'text-[var(--accent)] underline underline-offset-4' : 'text-[var(--text)] hover:text-[var(--accent)]'"
           :aria-current="(route.path.startsWith('/admin')) ? 'page' : undefined"
         >Admin</router-link>
       </nav>
 
-      <!-- Status area + dark toggle -->
+      <!-- Status area + theme selector -->
       <div class="hidden md:flex items-center gap-3">
         <div
           class="hidden md:flex items-center text-xs sm:text-sm text-gray-600 dark:text-gray-300"
@@ -179,17 +186,25 @@ watch(isShrunk, () => updateHeaderOffset())
             {{ statusText }}
           </span>
         </div>
-        <button
-          type="button"
-          class="inline-flex items-center justify-center rounded-md p-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
-          :aria-pressed="isDark"
-          :aria-label="isDark ? 'Désactiver le mode sombre' : 'Activer le mode sombre'"
-          @click="toggleDark()"
-        >
-          <span v-if="!isDark" class="i-heroicons-moon text-xl" aria-hidden="true" />
-          <span v-else class="i-heroicons-sun text-xl" aria-hidden="true" />
-          <span class="sr-only">Basculer le thème</span>
-        </button>
+        <div class="relative">
+          <details class="group">
+            <summary
+              class="list-none inline-flex items-center gap-2 cursor-pointer rounded-md px-3 py-2 bg-[var(--surface-alt)] text-[var(--text)] border border-[var(--border)] hover:bg-[color-mix(in_srgb,var(--surface-alt)_92%,black)]"
+              aria-label="Changer de thème"
+            >
+              <span class="i-heroicons-swatch text-lg" aria-hidden="true" />
+              <span class="text-sm font-medium">{{ themeLabel }}</span>
+            </summary>
+            <div
+              class="absolute right-0 mt-2 w-56 bg-[var(--surface)] text-[var(--text)] border border-[var(--border)] rounded-md shadow-lg p-1 z-50"
+              role="menu"
+            >
+              <button class="w-full text-left px-3 py-2 rounded hover:bg-[var(--surface-alt)]" @click="setTheme('light')">Clair</button>
+              <button class="w-full text-left px-3 py-2 rounded hover:bg-[var(--surface-alt)]" @click="setTheme('dark')">Sombre (noir)</button>
+              <button class="w-full text-left px-3 py-2 rounded hover:bg-[var(--surface-alt)]" @click="setTheme('rg')">Roland‑Garros</button>
+            </div>
+          </details>
+        </div>
       </div>
 
       <!-- Mobile hamburger -->
@@ -214,7 +229,7 @@ watch(isShrunk, () => updateHeaderOffset())
       <div
         ref="menuPanelRef"
         id="mobile-menu"
-        class="absolute left-0 right-0 top-0 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 shadow-lg origin-top transition-transform duration-150"
+        class="absolute left-0 right-0 top-0 bg-[var(--surface)] border-b border-[var(--border)] shadow-lg origin-top transition-transform duration-150"
         :style="{ transform: isMenuOpen ? 'translateY(0)' : 'translateY(-8px)' }"
       >
         <div class="px-4 py-3 flex items-center justify-between">
@@ -231,32 +246,32 @@ watch(isShrunk, () => updateHeaderOffset())
         <nav class="px-4 pb-4 flex flex-col gap-2" role="navigation" aria-label="Navigation mobile">
           <router-link
             to="/"
-            class="px-3 py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800 focus-visible:ring-2 focus-visible:ring-primary-500"
-            :class="route.path === '/' ? 'text-primary-700 dark:text-primary-300' : 'text-gray-800 dark:text-gray-200'"
+            class="px-3 py-2 rounded hover:bg-[var(--surface-alt)] focus-visible:ring-2 focus-visible:ring-[var(--ring)]"
+            :class="route.path === '/' ? 'text-[var(--accent)]' : 'text-[var(--text)]'"
             :aria-current="route.path === '/' ? 'page' : undefined"
             @click="onMenuLinkClick"
           >Accueil</router-link>
 
           <router-link
             to="/quiz"
-            class="px-3 py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800 focus-visible:ring-2 focus-visible:ring-primary-500"
-            :class="route.path === '/quiz' ? 'text-primary-700 dark:text-primary-300' : 'text-gray-800 dark:text-gray-200'"
+            class="px-3 py-2 rounded hover:bg-[var(--surface-alt)] focus-visible:ring-2 focus-visible:ring-[var(--ring)]"
+            :class="route.path === '/quiz' ? 'text-[var(--accent)]' : 'text-[var(--text)]'"
             :aria-current="route.path === '/quiz' ? 'page' : undefined"
             @click="onMenuLinkClick"
           >Quiz</router-link>
 
           <router-link
             to="/quiz/1/leaderboard"
-            class="px-3 py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800 focus-visible:ring-2 focus-visible:ring-primary-500"
-            :class="(route.path.startsWith('/quiz') && route.path.includes('/leaderboard')) ? 'text-primary-700 dark:text-primary-300' : 'text-gray-800 dark:text-gray-200'"
+            class="px-3 py-2 rounded hover:bg-[var(--surface-alt)] focus-visible:ring-2 focus-visible:ring-[var(--ring)]"
+            :class="(route.path.startsWith('/quiz') && route.path.includes('/leaderboard')) ? 'text-[var(--accent)]' : 'text-[var(--text)]'"
             :aria-current="(route.path.startsWith('/quiz') && route.path.includes('/leaderboard')) ? 'page' : undefined"
             @click="onMenuLinkClick"
           >Classement</router-link>
 
           <router-link
             to="/admin"
-            class="px-3 py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800 focus-visible:ring-2 focus-visible:ring-primary-500"
-            :class="(route.path.startsWith('/admin')) ? 'text-primary-700 dark:text-primary-300' : 'text-gray-800 dark:text-gray-200'"
+            class="px-3 py-2 rounded hover:bg-[var(--surface-alt)] focus-visible:ring-2 focus-visible:ring-[var(--ring)]"
+            :class="(route.path.startsWith('/admin')) ? 'text-[var(--accent)]' : 'text-[var(--text)]'"
             :aria-current="(route.path.startsWith('/admin')) ? 'page' : undefined"
             @click="onMenuLinkClick"
           >Admin</router-link>
@@ -266,17 +281,11 @@ watch(isShrunk, () => updateHeaderOffset())
           {{ statusText }}
         </div>
         <div class="px-4 pb-4">
-          <button
-            type="button"
-            class="w-full inline-flex items-center justify-center rounded-md p-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
-            :aria-pressed="isDark"
-            :aria-label="isDark ? 'Désactiver le mode sombre' : 'Activer le mode sombre'"
-            @click="toggleDark()"
-          >
-            <span v-if="!isDark" class="i-heroicons-moon text-xl mr-2" aria-hidden="true" />
-            <span v-else class="i-heroicons-sun text-xl mr-2" aria-hidden="true" />
-            <span>{{ isDark ? 'Mode sombre activé' : 'Mode sombre désactivé' }}</span>
-          </button>
+          <div class="grid grid-cols-1 gap-2">
+            <button class="px-3 py-2 rounded border border-[var(--border)] hover:bg-[var(--surface-alt)]" @click="setTheme('light')">Clair</button>
+            <button class="px-3 py-2 rounded border border-[var(--border)] hover:bg-[var(--surface-alt)]" @click="setTheme('dark')">Sombre (noir)</button>
+            <button class="px-3 py-2 rounded border border-[var(--border)] hover:bg-[var(--surface-alt)]" @click="setTheme('rg')">Roland‑Garros</button>
+          </div>
         </div>
       </div>
     </div>
