@@ -30,11 +30,11 @@ Application web full-stack moderne permettant de créer, participer et gérer de
 
 ### Fonctionnalités techniques
 - 💾 **Sauvegarde automatique** : Progression sauvegardée en localStorage
-- 🌙 **Mode sombre** : Thème adaptatif automatique
+- 🎨 **3 Modes d'affichage** : Clair, Sombre (noir complet), Roland-Garros (terre battue)
 - 📱 **Responsive** : Design mobile-first
 - ⚡ **Performance optimisée** : Code splitting, lazy loading
 - 🔄 **PWA** : Installation et utilisation hors-ligne
-- 🎨 **UI Moderne** : Animations fluides, design épuré
+- 🎨 **UI Moderne** : Animations fluides, design épuré avec UnoCSS
 
 ## 🛠 Stack Technique
 
@@ -141,59 +141,67 @@ answers
 - npm ou pnpm
 - Docker & Docker Compose (optionnel)
 
-### Installation locale
+### Installation et lancement
 
-#### Backend
+#### Option 1 — Tout-en-un (script automatique)
 
 ```bash
+cd /Users/aminesaddik/Documents/ESIEE/E4/ProjetWEB/quiz-app
+chmod +x ./start-dev.sh
+./start-dev.sh
+```
+
+Ce script lance automatiquement le backend et le frontend.
+
+#### Option 2 — Manuellement (2 terminaux séparés)
+
+**Terminal 1 (Backend Flask)**
+
+```bash
+cd /Users/aminesaddik/Documents/ESIEE/E4/ProjetWEB/quiz-app
+source venv/bin/activate
 cd quiz-api
-
-# Créer un environnement virtuel
-python -m venv venv
-source venv/bin/activate  # Windows: venv\Scripts\activate
-
-# Installer les dépendances
 pip install -r requirements.txt
-
-# Importer les questions
-python import_questions.py
-
-# Lancer le serveur
 python app_new.py
 ```
 
 Le backend sera disponible sur `http://localhost:5001`
 
-#### Frontend
+**Terminal 2 (Frontend Vite)**
 
 ```bash
-cd quiz-ui
-
-# Installer les dépendances
+cd /Users/aminesaddik/Documents/ESIEE/E4/ProjetWEB/quiz-app/quiz-ui
 npm install
-
-# Lancer le serveur de développement
 npm run dev
 ```
 
 Le frontend sera disponible sur `http://localhost:3000`
+
+#### Pour arrêter les serveurs
+
+```bash
+# Arrêter le backend (port 5001)
+lsof -ti:5001 | xargs kill -9 2>/dev/null
+
+# Arrêter le frontend (port 3000)
+lsof -ti:3000 | xargs kill -9 2>/dev/null
+```
 
 ## 🐳 Docker
 
 ### Build et lancement
 
 ```bash
-# Build et démarrage des conteneurs
-docker-compose up --build
+cd /Users/aminesaddik/Documents/ESIEE/E4/ProjetWEB/quiz-app
 
-# En arrière-plan
-docker-compose up -d --build
+# Build et démarrage des conteneurs (production)
+docker compose up -d --build
 
 # Arrêter les conteneurs
-docker-compose down
+docker compose down
 
 # Nettoyer volumes et images
-docker-compose down -v
+docker compose down -v
 docker system prune -a
 ```
 
@@ -207,14 +215,13 @@ docker system prune -a
 
 ### Variables d'environnement
 
-Créer un fichier `.env` à la racine :
+Les variables sont configurées dans `docker-compose.yml` :
 
-```env
+```yaml
 # Backend
-FLASK_ENV=development
-DATABASE_URL=sqlite:///quiz.db
-JWT_SECRET_KEY=Groupe 2
-CORS_ORIGINS=http://localhost:3000
+FLASK_ENV=production
+DATABASE_URL=sqlite:////app/data/quiz.db
+CORS_ORIGINS=http://localhost:3000,http://localhost:80
 
 # Frontend
 VITE_API_URL=http://localhost:5001/api
@@ -262,6 +269,20 @@ npm run preview
 ```
 
 ## 🧪 Tests
+
+### Tests Postman
+
+Pour lancer les tests Postman de l'API :
+
+1. Ouvrez Postman
+2. Importez la collection de tests fournie
+3. **IMPORTANT** : Configurez l'environnement avec la variable suivante :
+   - Variable : `baseUrl`
+   - Valeur : `http://localhost:5001/api`
+4. Assurez-vous que le backend est lancé (port 5001)
+5. Lancez les tests
+
+> ⚠️ **Note** : Ne modifiez pas les tests Postman eux-mêmes, seulement la variable d'environnement `baseUrl`.
 
 ### Tests unitaires (Vitest)
 
@@ -409,7 +430,18 @@ Pour toute question ou problème :
 
 ---
 
-**Note** : Mot de passe admin par défaut : `iloveflask`  
+## 📝 Notes importantes
+
+- **Mot de passe admin** : `iloveflask`
+- **Thèmes disponibles** : 
+  - 🌞 Clair (bleu foncé #0369a1)
+  - 🌙 Sombre (noir complet)
+  - 🎾 Roland-Garros (terre battue)
+- **Tests Postman** : Variable `baseUrl` = `http://localhost:5001/api`
+- **Ports par défaut** :
+  - Backend : 5001
+  - Frontend : 3000 (dev) / 80 (Docker)
+
 **Deadline** : 9 novembre 2025 23h59
 
-🎯 Bon quiz !
+🎯 Bon quiz ! 🎾
