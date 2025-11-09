@@ -1,0 +1,28 @@
+# Build frontend (prod)
+FROM node:lts-alpine as build
+
+# Installer Vue CLI (utilisé par certains scripts)
+RUN npm install -g @vue/cli
+
+# Répertoire de travail
+WORKDIR /app
+
+# Dépendances
+COPY package*.json ./
+RUN npm install
+
+# Code source
+COPY . .
+
+# IMPORTANT: en prod le front appelle le backend via /api sur le même domaine
+ENV VITE_API_URL=/api
+
+# Build Vite (dist/)
+RUN npm run build
+
+# Runtime: Nginx servant les fichiers statiques
+FROM nginx
+COPY --from=build /app/dist /usr/share/nginx/html
+COPY nginx.conf /etc/nginx/nginx.conf
+
+
