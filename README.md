@@ -189,6 +189,44 @@ lsof -ti:3000 | xargs kill -9 2>/dev/null
 
 ## 🐳 Docker
 
+### Démarrage Docker (macOS, zsh)
+
+```bash
+# 1) Démarrer Docker Desktop
+open -a Docker
+
+# 2) Vérifier que le démon est prêt
+docker version
+docker info
+docker ps
+
+# 3) Lancer les services en production locale
+cd /Users/aminesaddik/Documents/ESIEE/E4/ProjetWEB/quiz-app
+docker compose up -d --build
+docker compose ps
+
+# 4) Ouvrir les URLs
+open http://localhost:5001/health
+open http://localhost:3000
+
+# 5) Logs en direct (si besoin)
+docker compose logs -f --tail=100 api frontend
+
+# 6) Mode développement (hot‑reload)
+docker compose -f docker-compose.dev.yml up -d --build
+
+# 7) Arrêter et nettoyer
+docker compose down
+docker compose down -v
+docker system prune -f
+
+# 8) Dépannage « Cannot connect to the Docker daemon »
+unset DOCKER_HOST
+docker context ls
+docker context use desktop-linux   # sur Mac avec Docker Desktop
+open -a Docker
+```
+
 ### Build et lancement
 
 ```bash
